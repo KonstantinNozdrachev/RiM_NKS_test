@@ -5,10 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.os.persistableBundleOf
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
-class CustomAdapter(private val mList: List<Result>?) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+class CustomAdapter(private val mList: List<Result>?,val mItemClickListener:ItemClickListener) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+
+    interface ItemClickListener {
+        fun onItemClick (position: Int)
+    }
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,10 +31,12 @@ class CustomAdapter(private val mList: List<Result>?) : RecyclerView.Adapter<Cus
         val ItemsViewModel = mList?.get(position)
 
        // Picasso.get().load("https://i.imgur.com/DvpvklR.png").into(holder.imageView);
-        Picasso.get().load("https://rickandmortyapi.com/api/character/avatar"+mList?.get(position)?.id).into(holder.imageView);
+        Picasso.get().load("https://rickandmortyapi.com/api/character/avatar/${mList?.get(position)?.id}.jpeg").into(holder.imageView);
+                //+mList?.get(position)?.image).into(holder.imageView);
 
 
-
+        holder.main_rassa.text = ItemsViewModel?.species
+        holder.main_pol.text = ItemsViewModel?.gender
 
         holder.textView.text = ItemsViewModel?.name
 
@@ -41,8 +48,17 @@ class CustomAdapter(private val mList: List<Result>?) : RecyclerView.Adapter<Cus
     }
 
     // Holds the views for adding it to image and text
-    class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+    inner class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {  //??
         val imageView: ImageView = itemView.findViewById(R.id.imageview)
         val textView: TextView = itemView.findViewById(R.id.textView)
+
+        val main_rassa:TextView = itemView.findViewById(R.id.main_rassa)
+        val main_pol:TextView = itemView.findViewById(R.id.main_pol)
+
+        init {
+           ItemView.setOnClickListener{
+               mList?.get(position)?.id?.let {it -> mItemClickListener.onItemClick(it)}
+           }
+        }
     }
 }
